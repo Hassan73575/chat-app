@@ -48,6 +48,10 @@ if(isset($_POST['login'])){
         $_SESSION['username'] = $user['username'];
 
         header("Location: index.php");
+    }else{
+        echo "<script> 
+        alert('Please check your email and password');
+        </script>";
     }
 }
 ?>

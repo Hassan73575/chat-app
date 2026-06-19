@@ -19,91 +19,86 @@ if (!isset($_SESSION['id']) || !isset($_SESSION['username'])) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+        integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="chat.css">
 </head>
 
 <body>
-    <div class="nav">
-        <div class="name">
-            <h2 class="">DudesApp</h2>
-        </div>
-        <div>
-            <h3><?php
-            echo "Wellcome," . $_SESSION['username'];
-            ?></h3>
-        </div>
-    </div>
+    <?php include "navbar.php" ?>
 
-    <div class="container">
+    <div class="main">
+        <div class="container">
 
-        <div class="overflow-hidden chat-wrapper">
+            <div class="overflow-hidden chat-wrapper">
 
-            <!-- USERS -->
+                <!-- USERS -->
 
-            <div class="col-md-2 users-panel">
-                <div class="users container d-flex justify-content-between align-items-center gap-2 border-bottom">
-                    <h3 class="py-3">Users</h3>
-                    <i class="fa-solid fa-users"></i>
-                </div>
-                <div class="users-list list-group">
-                    <?php
-
-                    // $currentUser = $_SESSION['id'];
-                    $currentUser = $_SESSION['id'];
-
-                    $q = mysqli_query(
-                        $conn,
-                        "SELECT * FROM users WHERE id != $currentUser"
-                    );
-
-                    while ($user = mysqli_fetch_assoc($q)) {
-                        ?>
-                        <div class="user-item">
-                            <a href="?user=<?php echo $user['id']; ?>" class="list-group-item-action d-flex justify-content-between align-items-center text-dark p-3 border-bottom text-decoration-none">
-                                <?php echo $user['username']; ?>
-                                <i class="fa-regular fa-user"></i>
-                            </a>
-                        </div>
+                <div class="col-md-2 users-panel">
+                    <div class="users container d-flex justify-content-between align-items-center gap-2 border-bottom">
+                        <h3 class="py-3">Users</h3>
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <div class="users-list list-group">
                         <?php
-                    }
-                    ?>
-                </div>
-            </div>
 
-            <!-- CHAT -->
-            <!-- <meta http-equiv="refresh" content="15"> -->
+                        // $currentUser = $_SESSION['id'];
+                        $currentUser = $_SESSION['id'];
 
+                        $q = mysqli_query(
+                            $conn,
+                            "SELECT * FROM users WHERE id != $currentUser"
+                        );
 
-
-            <div class="chat-panel">
-
-                <div class="chat-header">
-                    <?php
-                    include "dbconnect.php";
-                    if (isset($_GET["user"])) {
-                        $id = $_GET["user"];
-                        $query = "SELECT * FROM `users` WHERE id = '$id';";
-                        $exe = mysqli_query($conn, $query);
-                        $user = mysqli_fetch_assoc($exe);
-                        echo $user["username"];
-
-                    } else {
-                        return;
-                    }
-
-                    ?>
-
+                        while ($user = mysqli_fetch_assoc($q)) {
+                            ?>
+                            <div class="user-item">
+                                <a href="?user=<?php echo $user['id']; ?>"
+                                    class="list-group-item-action d-flex justify-content-between align-items-center text-dark p-3 border-bottom text-decoration-none">
+                                    <?php echo $user['username']; ?>
+                                    <i class="fa-regular fa-user"></i>
+                                </a>
+                            </div>
+                            <?php
+                        }
+                        ?>
+                    </div>
                 </div>
 
-                <div class="chat-body" id="chatBody">
+                <!-- CHAT -->
+                <!-- <meta http-equiv="refresh" content="15"> -->
 
-                    <?php
 
-                    if (isset($_GET['user'])) {
-                        $chatUser = (int) $_GET['user'];
 
-                        $query = "
+                <div class="chat-panel">
+
+                    <div class="chat-header">
+                        <?php
+                        include "dbconnect.php";
+                        if (isset($_GET["user"])) {
+                            $id = $_GET["user"];
+                            $query = "SELECT * FROM `users` WHERE id = '$id';";
+                            $exe = mysqli_query($conn, $query);
+                            $user = mysqli_fetch_assoc($exe);
+                            echo $user["username"];
+
+                        } else {
+                            return;
+                        }
+
+                        ?>
+
+                    </div>
+
+                    <div class="chat-body" id="chatBody">
+
+                        <?php
+
+                        if (isset($_GET['user'])) {
+                            $chatUser = (int) $_GET['user'];
+
+                            $query = "
                                 SELECT * FROM messages
                                 WHERE
                                 (user_id = '$currentUser' AND receiver_id = '$chatUser')
@@ -112,45 +107,50 @@ if (!isset($_SESSION['id']) || !isset($_SESSION['username'])) {
                                 ORDER BY created_at ASC
                                 ";
 
-                        $exe = mysqli_query($conn, $query);
+                            $exe = mysqli_query($conn, $query);
 
-                        while ($message = mysqli_fetch_assoc($exe)) {
-                            if ($message['user_id'] == $currentUser) {
-                                ?>
-                                <div class="message sent">
-                                    <?php echo htmlspecialchars($message['message']); ?>
-                                </div>
-                                <?php
-                            } else {
-                                ?>
-                                <div class="message received">
-                                    <?php echo htmlspecialchars($message['message']); ?>
-                                </div>
-                                <?php
+                            while ($message = mysqli_fetch_assoc($exe)) {
+                                if ($message['user_id'] == $currentUser) {
+                                    ?>
+                                    <div class="message sent">
+                                        <?php echo htmlspecialchars($message['message']); ?>
+                                    </div>
+                                    <?php
+                                } else {
+                                    ?>
+                                    <div class="message received">
+                                        <?php echo htmlspecialchars($message['message']); ?>
+                                    </div>
+                                    <?php
+                                }
                             }
                         }
-                    }
-                    ?>
-                </div>
+                        ?>
+                    </div>
 
-                <div class="chat-footer">
-                    <form action="" method="post">
+                    <div class="chat-search">
+                        <form action="" method="post">
 
-                        <div class="input-group">
+                            <div class="input-group">
 
-                            <input type="text" class="form-control" name="message" placeholder="Type a message..."
-                                id="message">
+                                <input type="text" class="form-control" name="message" placeholder="Type a message..."
+                                    id="message">
 
-                            <button class="btn btn-primary" name="send" id="sendBtn">
-                                Send
-                            </button>
+                                <button class="btn btn-primary" name="send" id="sendBtn">
+                                    Send
+                                </button>
 
-                    </form>
+                        </form>
+                    </div>
+
                 </div>
 
             </div>
+
         </div>
     </div>
+        <?php include "footer.php" ?>
+
 
     <script src="chat.js"></script>
 
