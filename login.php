@@ -21,6 +21,10 @@
                 <input type="password" class="form-control" id="password" name="password" required>
             </div>
             <button type="submit" name="login" class="btn btn-primary">Login</button>
+            <div class="mb-3">
+                <label for="signup" class="form-label">Don't Signup yet ?</label>
+                <a type="signup" href="signup.php" name="signup" class="btn btn-primary">Signup</a>
+            </div>
     </div>
     
 </body>
@@ -31,23 +35,28 @@ include "dbconnect.php";
 
 if(isset($_POST['login'])){
 
-    $email = $_POST['email'];
-    $password = $_POST['password'];
+  $email = $_POST['email'];
+$password = $_POST['password'];
 
-    $query = "SELECT * FROM users
-              WHERE email='$email'
-              AND password='$password'";
+$query = "SELECT * FROM users WHERE email='$email'";
+$result = mysqli_query($conn, $query);
 
-    $result = mysqli_query($conn,$query);
+if (mysqli_num_rows($result) > 0) {
 
-    if(mysqli_num_rows($result)>0){
+    $user = mysqli_fetch_assoc($result);
 
-        $user = mysqli_fetch_assoc($result);
-
+    if (password_verify($password, $user['password'])) {
+        
         $_SESSION['id'] = $user['id'];
         $_SESSION['username'] = $user['username'];
 
         header("Location: index.php");
+        exit();
+
+    } else {
+        echo "Invalid password";
+    }
+
     }else{
         echo "<script> 
         alert('Please check your email and password');

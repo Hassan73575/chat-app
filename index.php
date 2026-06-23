@@ -5,7 +5,8 @@ session_start();
 
 if (!isset($_SESSION['id']) || !isset($_SESSION['username'])) {
     header("Location: login.php");
-}
+};
+$current_userid = $_SESSION['id'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -13,7 +14,7 @@ if (!isset($_SESSION['id']) || !isset($_SESSION['username'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>DudesApp</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
@@ -22,7 +23,8 @@ if (!isset($_SESSION['id']) || !isset($_SESSION['username'])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
         integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="chat.css">
+        <link rel="icon" href="images/app_logo.png" type="image/jpg">
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -67,9 +69,8 @@ if (!isset($_SESSION['id']) || !isset($_SESSION['username'])) {
                 </div>
 
                 <!-- CHAT -->
-                <!-- <meta http-equiv="refresh" content="15"> -->
-
-
+                
+                
 
                 <div class="chat-panel">
 
@@ -83,15 +84,16 @@ if (!isset($_SESSION['id']) || !isset($_SESSION['username'])) {
                             $user = mysqli_fetch_assoc($exe);
                             echo $user["username"];
 
-                        } else {
-                            return;
+                            } else {
                         }
 
                         ?>
 
                     </div>
-
+                    
                     <div class="chat-body" id="chatBody">
+                        
+                        <!-- <meta http-equiv="refresh" content="2"> -->
 
                         <?php
 
@@ -106,6 +108,7 @@ if (!isset($_SESSION['id']) || !isset($_SESSION['username'])) {
                                 (user_id = '$chatUser' AND receiver_id = '$currentUser')
                                 ORDER BY created_at ASC
                                 ";
+                                
 
                             $exe = mysqli_query($conn, $query);
 

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,21 +11,26 @@
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="chat.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+     <?php 
+    $query = "SELECT * FROM `users` WHERE id = '$current_userid';";
+    $exe = mysqli_query($conn , $query);
+    $profile_data = mysqli_fetch_assoc($exe)
+    ?>
     <div class="nav">
         <div class="name">
-            <h2 class="">DudesApp</h2>
-        </div>
+            <a href="index.php">Dudes App</a>        
+    </div>
         <div class="user-info">
             <h3><?php
             echo "Howdy " . $_SESSION['username'];
             ?>
             </h3>
             <a href="user-profile.php">
-            <i class="fa-regular fa-circle-user profile-icon"></i>
+            <img src="profile_pics/<?php echo $profile_data["profilepic"]?>" class="nav-profile-avatar">
             </a>
         </div>
     </div>
