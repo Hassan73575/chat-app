@@ -2,10 +2,11 @@
 include "dbconnect.php";
 session_start();
 
-
 if (!isset($_SESSION['id']) || !isset($_SESSION['username'])) {
     header("Location: login.php");
-};
+    exit();
+}
+
 $current_userid = $_SESSION['id'];
 ?>
 <!DOCTYPE html>
@@ -23,7 +24,7 @@ $current_userid = $_SESSION['id'];
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
         integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
-        <link rel="icon" href="images/app_logo.png" type="image/jpg">
+    <link rel="icon" href="images/app_logo.png" type="image/jpg">
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -32,71 +33,86 @@ $current_userid = $_SESSION['id'];
 
     <div class="main">
         <div class="container">
-
             <div class="overflow-hidden chat-wrapper">
-
-                <!-- USERS -->
-
-                <div class="col-md-2 users-panel">
-                    <div class="users container d-flex justify-content-between align-items-center gap-2 border-bottom">
-                        <h3 class="py-3">Users</h3>
-                        <i class="fa-solid fa-users"></i>
+                <aside class="users-panel">
+                    <div class="users-panel-header">
+                        <div>
+                            <p class="eyebrow">Inbox</p>
+                            <h3>Contacts</h3>
+                        </div>
+                        <div class="panel-icon">
+                            <i class="fa-solid fa-comments"></i>
+                        </div>
                     </div>
-                    <div class="users-list list-group">
+
+                    <div class="users-list">
                         <?php
-
-                        // $currentUser = $_SESSION['id'];
                         $currentUser = $_SESSION['id'];
+                        $q = mysqli_query($conn, "SELECT * FROM users WHERE id != $currentUser");
 
-                        $q = mysqli_query(
-                            $conn,
-                            "SELECT * FROM users WHERE id != $currentUser"
-                        );
-
-                        while ($user = mysqli_fetch_assoc($q)) {
-                            ?>
-                            <div class="user-item">
-                                <a href="?user=<?php echo $user['id']; ?>"
-                                    class="list-group-item-action d-flex justify-content-between align-items-center text-dark p-3 border-bottom text-decoration-none">
-                                    <?php echo $user['username']; ?>
-                                    <i class="fa-regular fa-user"></i>
+                        if (mysqli_num_rows($q) > 0) {
+                            while ($user = mysqli_fetch_assoc($q)) {
+                                ?>
+                                <a href="?user=<?php echo $user['id']; ?>" class="user-item">
+                                    <div class="user-pill-avatar">
+                                        <i class="fa-solid fa-circle-user"></i>
+                                    </div>
+                                    <div class="user-pill-content">
+                                        <span class="user-name"><?php echo htmlspecialchars($user['username']); ?></span>
+                                        <span class="user-caption">Tap to chat</span>
+                                    </div>
                                 </a>
+                                <?php
+                            }
+                        } else {
+                            ?>
+                            <div class="empty-users">No other users are available yet.</div>
+                            <?php
+                        }
+                        ?>
+                    </div>
+                </aside>
+
+                <section class="chat-panel">
+                    <div class="chat-header">
+                        <?php
+                        if (isset($_GET["user"])) {
+                            $id = (int) $_GET["user"];
+                            $query = "SELECT * FROM `users` WHERE id = '$id'";
+                            $exe = mysqli_query($conn, $query);
+                            $user = mysqli_fetch_assoc($exe);
+
+                            if ($user) {
+                                ?>
+                                <div class="chat-header-user">
+                                    <div class="avatar-bubble">
+                                        <i class="fa-solid fa-user"></i>
+                                    </div>
+                                    <div>
+                                        <h4><?php echo htmlspecialchars($user["username"]); ?></h4>
+                                        <p>Online now</p>
+                                    </div>
+                                </div>
+                                <?php
+                            }
+                        } else {
+                            ?>
+                            <div class="chat-header-user">
+                                <div class="avatar-bubble">
+                                    <i class="fa-solid fa-message"></i>
+                                </div>
+                                <div>
+                                    <h4>Select a conversation</h4>
+                                    <p>Choose someone from the list to start chatting</p>
+                                </div>
                             </div>
                             <?php
                         }
                         ?>
                     </div>
-                </div>
 
-                <!-- CHAT -->
-                
-                
-
-                <div class="chat-panel">
-
-                    <div class="chat-header">
-                        <?php
-                        include "dbconnect.php";
-                        if (isset($_GET["user"])) {
-                            $id = $_GET["user"];
-                            $query = "SELECT * FROM `users` WHERE id = '$id';";
-                            $exe = mysqli_query($conn, $query);
-                            $user = mysqli_fetch_assoc($exe);
-                            echo $user["username"];
-
-                            } else {
-                        }
-
-                        ?>
-
-                    </div>
-                    
                     <div class="chat-body" id="chatBody">
-                        
-                        <!-- <meta http-equiv="refresh" content="2"> -->
-
                         <?php
-
                         if (isset($_GET['user'])) {
                             $chatUser = (int) $_GET['user'];
 
@@ -107,82 +123,82 @@ $current_userid = $_SESSION['id'];
                                 OR
                                 (user_id = '$chatUser' AND receiver_id = '$currentUser')
                                 ORDER BY created_at ASC
-                                ";
-                                
+                            ";
 
                             $exe = mysqli_query($conn, $query);
 
-                            while ($message = mysqli_fetch_assoc($exe)) {
-                                if ($message['user_id'] == $currentUser) {
-                                    ?>
-                                    <div class="message sent">
-                                        <?php echo htmlspecialchars($message['message']); ?>
-                                    </div>
-                                    <?php
-                                } else {
-                                    ?>
-                                    <div class="message received">
-                                        <?php echo htmlspecialchars($message['message']); ?>
-                                    </div>
-                                    <?php
+                            if (mysqli_num_rows($exe) > 0) {
+                                while ($message = mysqli_fetch_assoc($exe)) {
+                                    if ($message['user_id'] == $currentUser) {
+                                        ?>
+                                        <div class="message sent">
+                                            <?php echo htmlspecialchars($message['message']); ?>
+                                        </div>
+                                        <?php
+                                    } else {
+                                        ?>
+                                        <div class="message received">
+                                            <?php echo htmlspecialchars($message['message']); ?>
+                                        </div>
+                                        <?php
+                                    }
                                 }
+                            } else {
+                                ?>
+                                <div class="empty-state">
+                                    <div class="empty-icon"><i class="fa-solid fa-paper-plane"></i></div>
+                                    <h3>No messages yet</h3>
+                                    <p>Say hello and start the conversation.</p>
+                                </div>
+                                <?php
                             }
+                        } else {
+                            ?>
+                            <div class="empty-state">
+                                <div class="empty-icon"><i class="fa-solid fa-comments"></i></div>
+                                <h3>Start your next conversation</h3>
+                                <p>Pick a contact from the sidebar and send a message instantly.</p>
+                            </div>
+                            <?php
                         }
                         ?>
                     </div>
 
                     <div class="chat-search">
-                        <form action="" method="post">
-
+                        <form action="" method="post" class="message-form">
                             <div class="input-group">
-
-                                <input type="text" class="form-control" name="message" placeholder="Type a message..."
-                                    id="message">
-
-                                <button class="btn btn-primary" name="send" id="sendBtn">
-                                    Send
+                                <input type="text" class="form-control" name="message" placeholder="Type a message..." id="message" autocomplete="off">
+                                <button class="btn btn-primary" type="submit" name="send" id="sendBtn">
+                                    <i class="fa-solid fa-paper-plane"></i>
                                 </button>
-
+                            </div>
                         </form>
                     </div>
-
-                </div>
-
+                </section>
             </div>
-
         </div>
     </div>
-        <?php include "footer.php" ?>
 
+    <?php include "footer.php" ?>
 
     <script src="chat.js"></script>
-
 </body>
-
 </html>
 <?php
 if (isset($_POST["send"]) && isset($_GET['user'])) {
+    $message = trim($_POST["message"]);
 
-    $message = $_POST["message"];
-    $sender_id = $_SESSION['id'];
-    $sender_name = $_SESSION['username'];
-    $receiverid = $_GET['user'];
+    if ($message !== "") {
+        $sender_id = $_SESSION['id'];
+        $sender_name = $_SESSION['username'];
+        $receiverid = (int) $_GET['user'];
 
-    $query = "INSERT INTO `messages`
-(`user_id`, `receiver_id`, `sender`, `message`)
-VALUES
-('$sender_id','$receiverid','$sender_name','$message')";
-    $exe = mysqli_query($conn, $query);
+        $query = "INSERT INTO `messages` (`user_id`, `receiver_id`, `sender`, `message`) VALUES ('$sender_id','$receiverid','$sender_name','$message')";
+        $exe = mysqli_query($conn, $query);
 
-    if ($exe) {
-        echo "<script> alert('Message sent successfully')</script>";
-    } else {
-        echo "<script> alert('Failed to send message')
-        window.location.href ='index.php';
-        </script>";
-
+        if (!$exe) {
+            echo "<script>alert('Failed to send message'); window.location.href='index.php';</script>";
+        }
     }
-    ;
-
 }
 ?>

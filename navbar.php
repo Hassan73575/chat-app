@@ -1,36 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
+<?php
+$query = "SELECT * FROM `users` WHERE id = '$current_userid';";
+$exe = mysqli_query($conn, $query);
+$profile_data = mysqli_fetch_assoc($exe);
+?>
+<div class="nav">
+    <a href="index.php" class="nav-brand">
+        <span class="nav-brand-icon"><i class="fa-solid fa-satellite-dish"></i></span>
+        <span>Dudes App</span>
+    </a>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-        crossorigin="anonymous"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="style.css">
-</head>
-
-<body>
-     <?php 
-    $query = "SELECT * FROM `users` WHERE id = '$current_userid';";
-    $exe = mysqli_query($conn , $query);
-    $profile_data = mysqli_fetch_assoc($exe)
-    ?>
-    <div class="nav">
-        <div class="name">
-            <a href="index.php">Dudes App</a>        
-    </div>
-        <div class="user-info">
-            <h3><?php
-            echo "Howdy " . $_SESSION['username'];
-            ?>
-            </h3>
-            <a href="user-profile.php">
-            <img src="profile_pics/<?php echo $profile_data["profilepic"]?>" class="nav-profile-avatar">
-            </a>
+    <div class="user-info">
+        <div class="user-meta">
+            <h3><?php echo "Howdy " . htmlspecialchars($_SESSION['username']); ?></h3>
+            <p>Stay connected</p>
         </div>
+        <a href="user-profile.php" class="nav-profile-link">
+            <img src="profile_pics/<?php echo htmlspecialchars($profile_data["profilepic"]); ?>" class="nav-profile-avatar">
+            <span class="status-dot"></span>
+        </a>
     </div>
+</div>

@@ -15,6 +15,12 @@ function logout() {
     confirm("Are you sure you want to logout?") &&
     (window.location.href = "logout.php");
 }
-setInterval(function(){
-    location.reload();
-},4000);
+setInterval(() => {
+    fetch(window.location.href)
+        .then(res => res.text())
+        .then(html => {
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+            document.getElementById('chatBody').innerHTML =
+                doc.getElementById('chatBody').innerHTML;
+        });
+}, 1000);
