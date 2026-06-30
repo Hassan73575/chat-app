@@ -49,9 +49,15 @@ if (isset($_POST['login'])) {
     if (mysqli_num_rows($result) > 0) {
         $user = mysqli_fetch_assoc($result);
 
+
         if (password_verify($password, $user['password'])) {
             $_SESSION['id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
+
+            // online status update
+
+            $onlinequery = " UPDATE users SET isonline=1 WHERE id = {$user['id']}";
+            $run = mysqli_query($conn ,$onlinequery);
 
             header("Location: index.php");
             exit();

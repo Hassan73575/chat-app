@@ -23,4 +23,13 @@ setInterval(() => {
             document.getElementById('chatBody').innerHTML =
                 doc.getElementById('chatBody').innerHTML;
         });
-}, 1000);
+}, 600);
+
+document.getElementById("sendBtn").addEventListener("click", function(){
+    let audio = document.getElementById("audio");
+    audio.play();
+});
+function recievemsg(){
+        let recieveaudio = document.getElementById("recieveaudio");
+    recieveaudio.play();
+};

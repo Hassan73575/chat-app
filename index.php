@@ -30,7 +30,9 @@ $current_userid = $_SESSION['id'];
 
 <body>
     <?php include "navbar.php" ?>
-
+    <div class="audio-container">
+        <audio id="audio" src="whatsapp_notification1.mp3" autoplay controls ></audio>
+    </div>
     <div class="main">
         <div class="container">
             <div class="overflow-hidden chat-wrapper">
@@ -55,7 +57,7 @@ $current_userid = $_SESSION['id'];
                                 ?>
                                 <a href="?user=<?php echo $user['id']; ?>" class="user-item">
                                     <div class="user-pill-avatar">
-                                        <i class="fa-solid fa-circle-user"></i>
+                                        <img src="profile_pics/<?php echo $user["profilepic"]?>" class="nav-profile-avatar" alt="">
                                     </div>
                                     <div class="user-pill-content">
                                         <span class="user-name"><?php echo htmlspecialchars($user['username']); ?></span>
@@ -86,11 +88,18 @@ $current_userid = $_SESSION['id'];
                                 ?>
                                 <div class="chat-header-user">
                                     <div class="avatar-bubble">
-                                        <i class="fa-solid fa-user"></i>
+                                        <img src="profile_pics/<?php echo $user["profilepic"]?>" class="nav-profile-avatar" alt="">
                                     </div>
                                     <div>
                                         <h4><?php echo htmlspecialchars($user["username"]); ?></h4>
-                                        <p>Online now</p>
+                                        <?php
+                                        $status = ($user["isonline"] == 1) ? "Online now" : "Offline";
+                                        $class = ($user["isonline"] == 1) ? "text-success" : "text-danger";
+                                        ?>
+
+                                        <p class="<?php echo $class; ?>">
+                                            <?php echo $status; ?>
+                                        </p>
                                     </div>
                                 </div>
                                 <?php
@@ -140,6 +149,12 @@ $current_userid = $_SESSION['id'];
                                         <div class="message received">
                                             <?php echo htmlspecialchars($message['message']); ?>
                                         </div>
+                                            <div class="audio-container">
+                                            <audio id="recieveaudio" src="whatsapp_notification.mp3" controls ></audio>
+                                        </div>
+                                        <script>
+                                            recievemsg();
+                                        </script>
                                         <?php
                                     }
                                 }
@@ -195,6 +210,7 @@ if (isset($_POST["send"]) && isset($_GET['user'])) {
 
         $query = "INSERT INTO `messages` (`user_id`, `receiver_id`, `sender`, `message`) VALUES ('$sender_id','$receiverid','$sender_name','$message')";
         $exe = mysqli_query($conn, $query);
+
 
         if (!$exe) {
             echo "<script>alert('Failed to send message'); window.location.href='index.php';</script>";
